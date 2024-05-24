@@ -2,31 +2,69 @@
 pragma solidity ^0.8.0;
 
 contract Uplift {
-    // state variables
     uint256 public Uniform;
     uint256 public Tuition;
-    uint256 public allowance;
+    uint256 public Allowance;
 
-    // function to set reimbursement amounts
-    function setReimbursement(uint256 _Uniform, uint256 _Tuition, uint256 _allowance) public {
-        require(_Uniform > 0 || _Tuition > 0 || _allowance > 0, "Please enter amount");
+    uint256 public lastUpdatedUniform;
+    uint256 public lastUpdatedTuition;
+    uint256 public lastUpdatedAllowance;
+    uint256 public totalInLastUpdate;
 
-        Uniform = _Uniform;
-        Tuition = _Tuition;
-        allowance = _allowance;
+    // Event to log updates
+    event ValuesUpdated(
+        uint256 uniform,
+        uint256 tuition,
+        uint256 allowance,
+        uint256 lastUpdatedUniform,
+        uint256 lastUpdatedTuition,
+        uint256 lastUpdatedAllowance,
+        uint256 totalInLastUpdate
+    );
+
+    // Function to set the values and update timestamps
+    function setValues(
+        uint256 _uniform,
+        uint256 _tuition,
+        uint256 _allowance,
+        uint256 _lastUpdatedUniform,
+        uint256 _lastUpdatedTuition,
+        uint256 _lastUpdatedAllowance
+    ) public {
+        require(_uniform > 0 || _tuition > 0 || _allowance > 0, "Please Enter an Amount");
+
+        Uniform = _uniform;
+        Tuition = _tuition;
+        Allowance = _allowance;
+
+        lastUpdatedUniform = _lastUpdatedUniform;
+        lastUpdatedTuition = _lastUpdatedTuition;
+        lastUpdatedAllowance = _lastUpdatedAllowance;
+
+        totalInLastUpdate = Uniform + Tuition + Allowance;
+
+        emit ValuesUpdated(
+            _uniform,
+            _tuition,
+            _allowance,
+            _lastUpdatedUniform,
+            _lastUpdatedTuition,
+            _lastUpdatedAllowance,
+            totalInLastUpdate
+        );
     }
 
-    function assertTotalAmount() public view returns (uint256) {
-        uint256 totalAmount = Uniform + Tuition + allowance;
-        // Ensure the total amount is greater than 0
-        assert(totalAmount > 0);
-        return totalAmount;
+    // Function to get the total of Uniform, Tuition, and Allowance
+    function getTotal() public view returns (uint256) {
+        uint256 total = Uniform + Tuition + Allowance;
+        assert(total > 0);  // Ensure the total is greater than 0
+        return total;
     }
 
-    // Function to revert if no amounts are set
-    function revertIfNoAmount() public view {
-        if (Uniform == 0 && Tuition == 0 && allowance == 0) {
-            revert("Please enter amount");
+    // Function to revert if all values are zero
+    function revertIfNoValues() public view {
+        if (Uniform == 0 && Tuition == 0 && Allowance == 0) {
+            revert("Please Enter an Amount");
         }
     }
 }
